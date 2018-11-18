@@ -29,7 +29,7 @@ createforhtahtraining
 	</action>
 
 	<end id="error" state="ERROR">Something went wrong.</end>
-	<end id="failed" state="FAILED">Could not send customer registration email.</end>
-	<end id="success" state="SUCCEEDED">Sent customer registration email.</end>
+	<end id="failed" state="FAILED">Could not send training email.</end>
+	<end id="success" state="SUCCEEDED">Sent training email.</end>
 
 </process>

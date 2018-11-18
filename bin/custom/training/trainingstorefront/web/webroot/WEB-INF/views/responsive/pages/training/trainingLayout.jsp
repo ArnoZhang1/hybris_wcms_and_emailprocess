@@ -16,7 +16,6 @@ createforhtahtraining
 	</cms:pageSlot>
 
 	<%--     促销商品组件 PromotionProductsComponent （这儿用的是客制化组件） 位于页面上  --%>
-	<div class="PromotionProducts"></div>
 	<cms:pageSlot position="PromotionProducts" var="comp" element="div"   >
 		<cms:component component="${comp}" element="div" />
 	</cms:pageSlot>
