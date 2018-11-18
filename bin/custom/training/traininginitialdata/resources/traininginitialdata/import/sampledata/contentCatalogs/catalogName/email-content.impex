@@ -8,15 +8,33 @@
 # Information and shall use it only in accordance with the terms of the
 # license agreement you entered into with SAP.
 # -----------------------------------------------------------------------
-# ImpEx for Importing Email Content
+#
+# Import the CMS content for the site emails
+#
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$wideContent=CMSImageComponent,BannerComponent
+$lang=en
+# Import config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
 
-# Macros / Replacement Parameter definitions
-$contentCatalog=__CONTENT_CATALOG_NAME__
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity'];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;Training_Send_Email_subject;de.hybris.training.facades.process.email.context.TrainingEmailContext;;"Training_Send_Email_subject";jar:/trainingcore/import/emails/training_send_email_subject.vm
+;Training_Send_Email_body;de.hybris.training.facades.process.email.context.TrainingEmailContext;;"Training_Send_Email_body";jar:/trainingcore/import/emails/training_send_email_body.vm
 
-$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+# Email page Template
+INSERT_UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;frontendTemplateName;subject(code);htmlTemplate(code);restrictedPageTypes(code)
+;;TrainingSendEmailTemplate;Training Send Email Template;true;TrainingSendEmailTemplate;Training_Send_Email_subject;Training_Send_Email_body;EmailPage
 
-# CMS Image Components
-INSERT_UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];name
+# Templates for CMS Cockpit Page Edit
+UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;TrainingSendEmailTemplate;jar:/trainingcore/import/cockpits/cmscockpit/structure-view/structure_trainingSendEmailTemplate.vm
 
-# Content Slots
-INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+# Email Pages
+INSERT_UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];fromEmail[lang=$lang];fromName[lang=$lang]
+;;TrainingSendEmailPage;Training Send Email;TrainingSendEmailTemplate;true;;"15695530502m@sina.cn";"Customer Services Team"
+
+
+
