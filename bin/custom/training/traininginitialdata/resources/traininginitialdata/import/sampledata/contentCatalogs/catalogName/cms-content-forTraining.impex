@@ -1,0 +1,145 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=electronicsContentCatalog
+$contentCatalogName=Electronics Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$picture=media(code, $contentCV);
+$image=image(code, $contentCV);
+$media=media(code, $contentCV);
+$page=page(uid, $contentCV);
+$contentPage=contentPage(uid, $contentCV);
+$product=product(code, $productCV)
+$category=category(code, $productCV)
+$siteResource=jar:de.hybris.platform.electronicsstore.constants.ElectronicsstoreConstants&/electronicsstore/import/sampledata/contentCatalogs/$contentCatalog
+$productResource=jar:de.hybris.platform.electronicsstore.constants.ElectronicsstoreConstants&/electronicsstore/import/sampledata/productCatalogs/$productCatalog
+$jarResourceCms=jar:de.hybris.platform.electronicsstore.constants.ElectronicsstoreConstants&/electronicsstore/import/sampledata/cockpits/cmscockpit
+
+# Site Logo Component
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;SiteLogoComponent;Site Logo Component;SiteLogoComponent;"/"
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;HomepageNavLink;Home Page Nav Link;/;HomepageNavLink;HomepageNavLink;;;;
+
+# CMS Mini Cart Component
+INSERT_UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;totalDisplay(code);shownProductCount;lightboxBannerComponent(&componentRef)
+;;MiniCart;Mini Cart;MiniCart;SUBTOTAL;3;LightboxHomeDeliveryBannerComponent
+
+# Navigation Bar Component
+INSERT_UPDATE NavigationBarCollectionComponent;$contentCV[unique=true];uid[unique=true];name;components(uid, $contentCV);&componentRef
+;;NavBarComponent;Navigation Bar Collection Componeent;BrandsBarComponent,DigitalCamerasBarComponent,FilmCamerasBarComponent,HandheldCamcordersBarComponent,PowerSuppliesBarComponent,FlashMemoryBarComponent,CameraAccessoriesBarComponent,SpecialOffersBarComponent;NavBarComponent
+INSERT_UPDATE BreadcrumbComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;breadcrumbComponent;Breadcrumb CMS Component;breadcrumbComponent
+# CMS Footer Component
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;&componentRef
+;;FooterComponent;2;FooterComponent
+
+# CMS Paragraph Component (Contact information)
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ContactInfo;Contact information;ContactInfo
+# CMS Language and Currency Component
+INSERT_UPDATE LanguageCurrencyComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;LangCurrencyComponent;Language and Currency Component;LangCurrencyComponent
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AnonymousConsentManagementComponent;Anonymous Consent Management Component;/WEB-INF/views/responsive/pages/consent/consentmanagement.jsp;;AnonymousConsentManagementComponent
+;;CookieNotificationComponent;Cookie Notification Component;/WEB-INF/views/responsive/pages/consent/cookienotification.jsp;;CookieNotificationComponent
+
+# CMS Assisted Service Component
+INSERT_UPDATE AssistedServiceComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;AssistedServiceComponent;Assisted Service Component;AssistedServiceComponent
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SiteLogoSlot;SiteLogoComponent
+;;HomepageNavLinkSlot;HomepageNavLink
+;;MiniCartSlot;MiniCart
+;;NavigationBarSlot;NavBarComponent,breadcrumbComponent
+;;FooterSlot;FooterComponent
+;;HeaderLinksSlot;ContactInfo
+;;SearchBoxSlot;SearchBox,LangCurrencyComponent
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)[mode=append]
+;;TopHeaderSlot;true;CookieNotificationComponent,AnonymousConsentManagementComponent,AssistedServiceComponent
+
+
+##  Remove the language currency component from the search and place a tag in the footer
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+#################    HOME PAGE START     #################
+
+###  Home page splash Slot 1  #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageSplashBannerComponent;Electronics Homepage Splash Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;ElectronicsHompageSplashBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageDiscountBannerComponent;Electronics Homepage Discount Banner Component;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/c/585;ElectronicsHompageDiscountBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;true;ElectronicsHompageSplashBannerComponent,ElectronicsHompageDiscountBannerComponent
+
+###  Home page slot 2A  ####
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageLightFamBannerComponent;Electronics Homepage Light Family Banner Component;/Open-Catalogue/Cameras/DigitalCameras/Digital-Compacts/c/576;ElectronicsHompageLightFamBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageLightFamTextBannerComponent;Electronics Homepage Light Family Text Banner Component;/Open-Catalogue/Cameras/CameraAccessories-%26-Supplies/CameraLenses/c/588;ElectronicsHompageLightFamTextBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2ASlot-Homepage;true;ElectronicsHompageLightFamBannerComponent,ElectronicsHompageLightFamTextBannerComponent
+
+#### Home section 2B #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageCamcordersBannerComponent;Electronics Homepage Camcorders Banner Component;/Open-Catalogue/Components/PowerSupplies/c/816;ElectronicsHompageCamcordersBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageCamcordersChildBannerComponent;Electronics Homepage Light Family Banner Component Child;/Open-Catalogue/Cameras/Hand-held-Camcorders/c/584;ElectronicsHompageCamcordersChildBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2BSlot-Homepage;true;ElectronicsHompageCamcordersChildBannerComponent,ElectronicsHompageCamcordersBannerComponent
+## Home section 2C
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section2CSlot-Homepage;
+
+## Home section 3
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];&componentRef
+;;ElectronicsHomepageProductCarouselComponent;ElectronicsHomepageProductCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$productCV);scroll(code);popup;&componentRef
+;;NewElectronicsHomepageProductCarouselComponent;What's New Electronics Homepage Product Carousel;2278102,1992693,1981415,1934796,1776948,1641905,932577;allVisible;false;NewElectronicsHomepageProductCarouselComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section3Slot-Homepage;ElectronicsHomepageProductCarouselComponent,NewElectronicsHomepageProductCarouselComponent
+
+#### Section 4
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageSmDiscountBannerComponent;Electronics Homepage Small Discount Banner Component;/Open-Catalogue/Cameras/Webcams/Web-Camera-%28100KpixelM-CMOS%2C-640X480%2C-USB-1-1%29-Black/p/280916;ElectronicsHompageSmDiscountBannerComponent
+;;ElectronicsHompageShopBannerComponent;Electronics Homepage Shop Banner Component;/Open-Catalogue/Cameras/Webcams/QuickCam-for-Notebooks-Pro/p/479742;ElectronicsHompageShopBannerComponent
+;;ElectronicsHompageShipmentBannerComponent;Electronics Homepage Shipment Banner Component;/Open-Catalogue/Cameras/DigitalCameras/Digital-Compacts/NV10/p/553637;ElectronicsHompageShipmentBannerComponent
+;;ElectronicsHompageServiceBannerComponent;Electronics Homepage Service Banner Component;/Open-Catalogue/Cameras/CameraAccessories-%26-Supplies/CameraFlashes/Light-HVL-20DW2/p/289540;ElectronicsHompageServiceBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section4Slot-Homepage;true;ElectronicsHompageSmDiscountBannerComponent,ElectronicsHompageShopBannerComponent,ElectronicsHompageShipmentBannerComponent,ElectronicsHompageServiceBannerComponent
+
+### Section 5
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageFreeDelBannerComponent;Electronics Homepage Free Delivery Banner Component;/faq;ElectronicsHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section5Slot-Homepage;true;ElectronicsHompageFreeDelBannerComponent
+
+#################    HOME PAGE END       #################

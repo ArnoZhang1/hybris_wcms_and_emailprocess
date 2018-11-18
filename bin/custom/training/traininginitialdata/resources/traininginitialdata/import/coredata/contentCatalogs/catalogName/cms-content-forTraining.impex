@@ -1,0 +1,79 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the CMS content for the Electronics site
+#
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+
+# Create PageTemplates
+# These define the layout for pages
+# "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;LandingPage2Template;Landing Page 2 Template;layout/landingLayout2Page;CategoryPage,ContentPage
+
+
+# Add Velocity templates that are in the CMS Cockpit. These give a better layout for editing pages
+# The FileLoaderValueTranslator loads a File into a String property. The templates could also be inserted in-line in this file.
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+
+;;LandingPage2Template      ;$jarResourceCms/structure-view/structure_landingPage2Template.vm
+
+# Create ContentSlotNames
+# Each PageTemplate has a number of ContentSlotNames, with a list of valid components for the slot.
+# There are a standard set of slots and a number of specific slots for each template.
+# Standard slots are SiteLogo, HeaderLinks, MiniCart and NavigationBar (that all appear in the Header), and the Footer. 
+
+
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='LandingPage2Template'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section2A;;;narrow
+;Section2B;;;narrow
+;Section2C;;;wide
+;Section3;;;wide
+;Section4;;;narrow
+;Section5;;;wide
+;Footer;;;footer
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;PlaceholderContentSlot;;;
+
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='LandingPage2Template'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-LandingPage2;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-LandingPage2;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-LandingPage2;SearchBox;;SearchBoxSlot;true
+;;MiniCart-LandingPage2;MiniCart;;MiniCartSlot;true
+;;NavigationBar-LandingPage2;NavigationBar;;NavigationBarSlot;true
+;;Footer-LandingPage2;Footer;;FooterSlot;true
+;;TopHeaderSlot-LandingPage2;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-LandingPage2;BottomHeaderSlot;;BottomHeaderSlot;true
+;;PlaceholderContentSlot-LandingPage2;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;HomepageLink-LandingPage2;HomepageNavLink;;HomepageNavLinkSlot;true
+
+
+
+# Site-wide Homepage
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;homepage;Homepage;LandingPage2Template;homepage
+
+
