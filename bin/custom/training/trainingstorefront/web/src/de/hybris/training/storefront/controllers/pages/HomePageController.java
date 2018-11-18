@@ -91,6 +91,32 @@ public class HomePageController extends AbstractPageController {
 		return getViewForPage(model);
 	}
 
+	@Autowired
+	private BusinessProcessService businessProcessService;
+	@Autowired
+	private BaseStoreService baseStoreService;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private CommonI18NService commonI18NService;
+	@Autowired
+	private ModelService modelService;
+
+	@RequestMapping(value = "/testSendEmail", method = RequestMethod.GET)
+	@ResponseBody
+	public String testSendEmail(final Model model) {
+		final TrainingProcessModel trainingProcessModel = (TrainingProcessModel) businessProcessService
+				.createProcess(
+						"trainingEmailProcess-" + userService.getCurrentUser() + "-" + System.currentTimeMillis(),
+						"trainingEmailProcess");
+		trainingProcessModel.setSite(getBaseSiteService().getCurrentBaseSite());
+		trainingProcessModel.setCustomer((CustomerModel) userService.getCurrentUser());
+		trainingProcessModel.setLanguage(commonI18NService.getCurrentLanguage());
+		trainingProcessModel.setStore(baseStoreService.getCurrentBaseStore());
+		modelService.save(trainingProcessModel);
+		businessProcessService.startProcess(trainingProcessModel);
+		return "";
+	}
 
 	protected void updatePageTitle(final Model model, final AbstractPageModel cmsPage) {
 		storeContentPageTitleInModel(model, getPageTitleResolver().resolveHomePageTitle(cmsPage.getTitle()));
