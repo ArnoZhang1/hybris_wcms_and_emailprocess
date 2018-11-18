@@ -11,8 +11,8 @@
 #
 # Import the CMS content for the site emails
 #
-$contentCatalog=__CONTENT_CATALOG_NAME__
-$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
 
 # Import config properties into impex macros
 UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
@@ -20,9 +20,10 @@ $emailResource=$config-emailResourceValue
 
 # Language
 $lang=zh
-
-# CMS components and Email velocity templates
-UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity'];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;Training_Send_Email_subject;de.hybris.training.facades.process.email.context.TrainingEmailContext;;"Training_Send_Email_subject";jar:/trainingcore/import/emails/training_send_email_subject.vm
+;Training_Send_Email_body;de.hybris.training.facades.process.email.context.TrainingEmailContext;;"Training_Send_Email_body";jar:/trainingcore/import/emails/training_send_email_body.vm
 
 # Email Pages
-UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];fromEmail[lang=$lang];fromName[lang=$lang]
+INSERT_UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];masterTemplate(uid,$contentCV) ;fromEmail[lang=$lang];fromName[lang=$lang]
+;;TrainingSendEmailPage;TrainingSendEmailTemplate;"15695530502m@sina.cn";"Customer Services Team"
