@@ -1,0 +1,85 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#createforhtahtraining
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+# createforhtahtraining
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the CMS content for the site
+#
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+
+# Create PageTemplates
+# These define the layout for pages
+# "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;TrainingPageTemplate;Product Details Page Template;training/trainingLayout;ContentPage
+
+
+# Add Velocity templates that are in the CMS Cockpit. These give a better layout for editing pages
+# The FileLoaderValueTranslator loads a File into a String property. The templates could also be inserted in-line in this file.
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;TrainingPageTemplate;$jarResourceCms/structure-view/structure_landingPage1Template.vm
+
+# Create ContentSlotNames
+# Each PageTemplate has a number of ContentSlotNames, with a list of valid components for the slot.
+# There are a standard set of slots and a number of specific slots for each template.
+# Standard slots are SiteLogo, HeaderLinks, MiniCart and NavigationBar (that all appear in the Header), and the Footer. 
+
+INSERT_UPDATE BreadcrumbComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;Breadcrumb;Breadcrumb CMS Component;Breadcrumb
+
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;SearchBoxSlot;true;SearchBox
+;;BreadcrumbSlot;true;Breadcrumb
+#用于校验卡槽内的组件格式是否匹配
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='TrainingPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SearchBox;;;searchbox
+;breadcrumb;;;wide
+
+
+# Bind Content Slots to Page Templates
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='TrainingPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SearchBox-Training;SearchBox;;SearchBoxSlot;true
+;;Breadcrumb-Training;Breadcrumb;;BreadcrumbSlot;true
+
+# Create Content Pages
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;trainingPage1;training 1;TrainingPageTemplate;true;
+;;trainingPage2;training 2;TrainingPageTemplate;true;
+
+
+INSERT_UPDATE PromotionProductsComponent;$contentCV[unique=true];uid[unique=true];&componentRef
+;;PromotionProducts1;PromotionProducts1
+;;PromotionProducts2;PromotionProducts2
+INSERT_UPDATE SampleTrainingComponent;$contentCV[unique=true];uid[unique=true];linkUrl;&componentRef
+;;SampleTrainingComponent1;www.baidu.com;SampleTrainingComponent1
+;;SampleTrainingComponent2;/;SampleTrainingComponent2
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;PromotionProducts-trainingPage1;PromotionProducts Slot for trainingPage1;true;PromotionProducts1
+;;SampleTraining-trainingPage1;SampleTraining Slot for trainingPage1;true;SampleTrainingComponent1
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;PromotionProducts-trainingPage2;PromotionProducts Slot for trainingPage2;true;PromotionProducts2
+;;SampleTraining-trainingPage2;SampleTraining Slot for trainingPage2;true;SampleTrainingComponent2
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;PromotionProducts-trainingPage1;PromotionProducts;trainingPage1;PromotionProducts-trainingPage1
+;;SampleTraining-trainingPage1;SampleTraining;trainingPage1;SampleTraining-trainingPage1
+;;PromotionProducts-trainingPage2;PromotionProducts;trainingPage2;PromotionProducts-trainingPage2
+;;SampleTraining-trainingPage2;SampleTraining;trainingPage2;SampleTraining-trainingPage2
