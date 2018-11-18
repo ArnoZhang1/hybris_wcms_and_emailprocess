@@ -110,6 +110,45 @@
                 </attributes>
             </itemtype>
         </typegroup>
+        <!--htahtraining start!-->
+        <typegroup name="Training">
+            <itemtype code="PromotionProductsComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="jjgpp.hybris.core.jalo.PromotionProductsComponent">
+                <attributes>
+                    <attribute type="Product" qualifier="product">
+                        <description>promotion product</description>
+                        <modifiers />
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+            <itemtype code="SampleTrainingComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="jjgpp.hybris.core.jalo.PromotionProductsComponent">
+                <attributes>
+                    <attribute type="java.lang.String" qualifier="linkUrl">
+                        <description>promotion url</description>
+                        <modifiers />
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+            <itemtype code="TrainingProcess" extends="StoreFrontProcess"
+                      autocreate="true" generate="true"
+                      jaloclass="de.hybris.platform.commerceservices.jalo.process.TrainingProcess">
+                <description>Training email Process</description>
+                <attributes>
+                    <attribute qualifier="customer" type="Customer">
+                        <persistence type="property" />
+                        <description>Attribute contains customer object that will be used in the process.</description>
+                    </attribute>
+                    <attribute qualifier="language" type="Language">
+                        <persistence type="property" />
+                        <description>Attribute contains language that will be used in the process.</description>
+                    </attribute>
+                </attributes>
+            </itemtype>
+        </typegroup>
 
+        <!--htahtraining end!-->
     </itemtypes>
 </items>
