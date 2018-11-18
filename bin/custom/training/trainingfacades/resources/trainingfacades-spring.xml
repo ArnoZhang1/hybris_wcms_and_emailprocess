@@ -189,4 +189,7 @@
 	</bean>
 
 	<bean id="genderData" class="de.hybris.training.facades.product.data.GenderData" scope="prototype"/>
+	<bean id="trainingEmailContext" class="de.hybris.training.facades.process.email.context.TrainingEmailContext" parent="abstractEmailContext" scope="prototype">
+		<property name="customerConverter" ref="customerConverter"/>
+	</bean>
 </beans>
